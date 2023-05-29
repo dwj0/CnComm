@@ -117,7 +117,7 @@
 	#define CN_2STR(L)		_T(#L)					//!< 将表达式L转换成字符串
 	#define CN_LINE(L)		CN_2STR(L)				//!< 将行号L转换成字符串
 	/*! 内部断言 启用异常将抛出异常 否则调试版将退出 发行版未启用异常将不做任何处理 */
-	#define CN_ASSERT(E)	((E) ? true : CnComm::Assert(_T("CN_ASSERT(")_T(#E)_T(") failed; CnComm(")CN_LINE(__LINE__)_T("); ")))
+	#define CN_ASSERT(E)	((E) ? true : CnComm::Assert(_T("CN_ASSERT(") _T(#E) _T(") failed; CnComm(") CN_LINE(__LINE__) _T("); ")))
 #endif
 
 //CN_COMM_STD_EXCEPTION CN_ASSERT 将抛出标准C++异常			
@@ -410,7 +410,7 @@ public:
 		if(!CN_ASSERT(_tcslen(szPortName) < 64 - 1))
 			return false;
 		
-		_tcscpy(szName_, szPortName);
+		_tcscpy_s(szName_, _countof(szName_), szPortName);
 		dwPort_ = dwPort;//用于通知消息
 		
 		if (!CN_ASSERT(OpenPort()))
@@ -601,7 +601,7 @@ public:
 	{
 		va_list va;
 		va_start(va, szFormat);
-		_vsnprintf(szBuffer, dwLength, szFormat, va);
+		_vsnprintf_s(szBuffer, dwLength, dwLength, szFormat, va);
 		va_end(va);
 		
 		return Write(szBuffer);
@@ -611,27 +611,7 @@ public:
 	{
 		va_list va;
 		va_start(va, szFormat);
-		_vsnwprintf(szBuffer, dwLength, szFormat, va);
-		va_end(va);
-		
-		return Write(szBuffer);
-	}
-	//! 写串口 szBuffer 可以输出格式字符串 不检查缓冲区长度 小心溢出
-	DWORD Write(char *szBuffer, char * szFormat, ...)
-	{
-		va_list va;
-		va_start(va, szFormat);
-		vsprintf(szBuffer, szFormat, va);
-		va_end(va);
-		
-		return Write(szBuffer);
-	}
-	//! 写串口 szBuffer 可以输出格式字符串 不检查缓冲区长度 小心溢出
-	DWORD Write(wchar_t *szBuffer, wchar_t * szFormat, ...)
-	{
-		va_list va;
-		va_start(va, szFormat);
-		vswprintf(szBuffer, szFormat, va);
+		_vsnwprintf_s(szBuffer, dwLength, dwLength, szFormat, va);
 		va_end(va);
 		
 		return Write(szBuffer);
@@ -1505,13 +1485,13 @@ public:
 		TCHAR szMsg[256];
 		DWORD dwError, dwLength;
 		
-		_tcscpy(szMsg, szMessage);
+		_tcscpy_s(szMsg, _countof(szMsg),szMessage);
 
 		dwError = GetLastError();
 		if (dwError)//! 错误代码(GetLastError())不为 0 输出错误描述  
 		{
 			dwLength = _tcslen(szMsg);
-			_sntprintf(szMsg + dwLength, 256 - _tcslen(szMsg), _T("Code:%d; "), dwError);
+			_sntprintf_s(szMsg + dwLength, 256 - _tcslen(szMsg), 256 - _tcslen(szMsg), _T("Code:%d; "), dwError);
 			dwLength = _tcslen(szMsg);
 
 			FormatMessage(
