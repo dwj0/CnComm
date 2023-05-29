@@ -587,14 +587,14 @@ public:
 	{
 		CN_ASSERT(szBuffer);
 		
-		return Write((LPCVOID)szBuffer, strlen(szBuffer));
+		return Write((LPCVOID)szBuffer, (DWORD)strlen(szBuffer));
 	}
 	//! 写串口 UNICODE字符 写ANSI C 模式字符串指针 
 	DWORD Write(const wchar_t *szBuffer)
 	{
 		CN_ASSERT(szBuffer);
 		
-		return Write((LPCVOID)szBuffer, wcslen(szBuffer)*sizeof(wchar_t));
+		return Write((LPCVOID)szBuffer, (DWORD)wcslen(szBuffer)*sizeof(wchar_t));
 	}
 	//! 写串口 szBuffer 可以输出格式字符串 包含缓冲区长度
 	DWORD Write(char *szBuffer, DWORD dwLength, char * szFormat, ...)
@@ -1182,12 +1182,12 @@ public:
 		//! 写入ANSI字符串缓冲区 \sa Write(LPCVOID lpBuf, DWORD dwSize)
 		DWORD Write(const char* lpBuf)
 		{
-			return Write(lpBuf, strlen(lpBuf));
+			return Write(lpBuf, (DWORD)strlen(lpBuf));
 		}
 		//! 写入UNICODE字符串缓冲区 \sa Write(LPCVOID lpBuf, DWORD dwSize)
 		DWORD Write(const wchar_t* lpBuf)
 		{
-			return Write(lpBuf, wcslen(lpBuf)*sizeof(wchar_t));
+			return Write(lpBuf, (DWORD)wcslen(lpBuf)*sizeof(wchar_t));
 		}
 		//! 写入缓冲区 \param[out] lpBuf 目标缓冲区 \param[in] dwSize 数据字节数 \return 实际复制数据字节数
 		DWORD Write(LPCVOID lpBuf, DWORD dwSize)
@@ -1220,13 +1220,13 @@ public:
 		DWORD SafeWrite(const char* lpBuf)
 		{
 			InnerLock lock(this);
-			return Write(lpBuf, strlen(lpBuf));
+			return Write(lpBuf, (DWORD)strlen(lpBuf));
 		}
 		//! 线程安全写入UNICODE字符串缓冲区 \sa Write(LPCVOID lpBuf, DWORD dwSize)
 		DWORD SafeWrite(const wchar_t* lpBuf)
 		{
 			InnerLock lock(this);
-			return Write(lpBuf, wcslen(lpBuf)*sizeof(wchar_t));
+			return Write(lpBuf, (DWORD)wcslen(lpBuf)*sizeof(wchar_t));
 		}
 		//! 复制数据 \param[out] lpBuf 目标缓冲区 \param[in] dwSize 数据字节数 \param[in] dwStart 源缓冲区开始偏移值 \return 实际复制数据字节数
 		DWORD Copy(LPVOID lpBuf, DWORD dwSize, DWORD dwStart = 0)
@@ -1490,9 +1490,9 @@ public:
 		dwError = GetLastError();
 		if (dwError)//! 错误代码(GetLastError())不为 0 输出错误描述  
 		{
-			dwLength = _tcslen(szMsg);
+			dwLength = (DWORD)_tcslen(szMsg);
 			_sntprintf_s(szMsg + dwLength, 256 - _tcslen(szMsg), 256 - _tcslen(szMsg), _T("Code:%d; "), dwError);
-			dwLength = _tcslen(szMsg);
+			dwLength = (DWORD)_tcslen(szMsg);
 
 			FormatMessage(
 				FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
